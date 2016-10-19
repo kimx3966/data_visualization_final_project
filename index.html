@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<head>
+<meta charset="utf-8">
+<script type="text/javascript" src="d3.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+<title>Victims of Gun Violence & Google Trends</title>
+</head>
+
+
+<style>
+ 
+	#chart {
+		width: 1300px;
+		height: 720px;
+    padding: 30px;
+		margin: auto;
+	}
+
+  #title{
+    color: #FF4B4C;
+    left: 100px;
+    top: 20px;
+    font-size: 36px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0.8;
+  }
+
+  #intro{
+    color: #808080;
+    left: 100px;
+    top: 135px;
+    font-size: 14px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+  }
+
+
+  #viol01{
+    color: #FF0000;
+    left: 450px;
+    top: 290px;
+    font-size: 18px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0;
+  }
+
+  #viol01_text{
+    color: black;
+    left: 450px;
+    top: 345px;
+    font-size: 9px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0;
+  }
+
+
+  #viol02{
+    color: #FF0000;
+    left: 820px;
+    top: 40px;
+    font-size: 18px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0;
+  }
+
+  #viol02_text{
+    color: black;
+    left: 820px;
+    top: 120px;
+    font-size: 9px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0;
+  }
+
+  #viol03{
+    color: #FF0000;
+    left: 1150px;
+    top: 290px;
+    font-size: 18px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0;
+  }
+
+  #viol03_text{
+    color: black;
+    left: 1150px;
+    top: 350px;
+    font-size: 9px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0;
+  }
+
+  #viol04{
+    color: #FF0000;
+    left: 1220px;
+    top: 290px;
+    font-size: 18px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0;
+  }
+
+  #viol04_text{
+    color: black;
+    left: 1220px;
+    top: 370px;
+    font-size: 9px;
+    font-family: Georgia, sans-serif;
+    position: absolute;
+    opacity: 0;
+  }
+ 
+</style>
+
+<body>
+	<div id="chart">
+    <p id="title">Victims of Gun Violence <br>& Google Trends</p>
+    <p id="intro">Gun violence is a serious problem in the U.S.<br>as
+                thousands of people are killed or injured<br> by firearms every year. 
+                This bar chart shows<br>Google trends data over the last 8 years and<br>
+                the most notable incidents are highlighted<br>
+                in red. These peaks show that people's concern <br>
+                over gun violence skyrockets everytime<br>
+                there is a mass shooting.
+                </p>
+
+
+
+
+
+    <p id="viol01"><strong>Cumbria<br>Shooting</strong></p>
+    <p id="viol01_text"><strong>A gunman, Derrick Bird,<br> killed 12 people and<br> wounded 25 others
+    <br>in the county of Cumbria,<br> England.<br>(June 02, 2010)
+</strong></p>
+    
+    <p id="viol02"><strong>Sandy<br>Hook<br>Shooting</strong></p>
+    <p id="viol02_text"><strong>A gunman, Adam Lanza, <br> killed 20 childeren
+and<br>  six adults at a primary school<br>
+in the US state of Connecticut.<br>
+(December 14, 2012)</strong></p>
+
+
+  <p id="viol03"><strong>Mayhem in<br>New York</strong></p>
+    <p id="viol03_text"><strong>Seven people were killed and<br> 
+four more people were wounded <br>in the western Bronx, New York City.<br>
+(September 20, 2015)</strong></p>
+
+  <p id="viol04"><strong>San<br>Bernardino<br>Shooting</strong></p>
+    <p id="viol04_text"><strong>14 people are killed and 17 people<br> are wounded in San Bernardino, California.(December 03, 2015)</strong></p>
+
+
+  </div>
+
+</body>
+ 
+<script>
+//gunViolence.csv
+
+d3.csv("data/gun.csv", function(error, data) {
+
+var	parseDate = d3.time.format("%Y-%m").parse;
+
+data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.gun_violence = +d.gun_violence;
+    });
+
+
+
+var padding = {top: 20, right: 0, bottom: 20, left: 0},
+    w = 1280 - padding.left - padding.right,    
+    h = 660 - padding.top - padding.bottom,
+    barPadding = 2;   
+
+var yScale = d3.scale.linear()
+		.domain([0, d3.max(data, function(d) { return d.gun_violence; })])
+		.range([0, h]);  
+
+var xScale = d3.scale.linear()
+		.domain([d3.min(data, function(d) { return d.date; }), d3.max(data, function(d) { return d.date; })])
+		.range([w, 0]);
+
+var googleScale = d3.scale.linear()
+               .domain([0,100])
+               .range([h,0]);
+
+var svg = d3.select("#chart")
+	.append("svg")
+    .attr("width", w + padding.left + padding.right)
+    .attr("height", h + padding.top + padding.bottom)
+    .append("g")
+    .attr("transform", 
+          "translate(" + padding.left + "," + padding.top + ")");
+
+var googleTrendRange = [0, 20, 40, 60, 80,100];
+
+ svg.selectAll("line")
+    .data(googleTrendRange)
+    .enter()
+    .append("line")
+    .attr("x1",function(d){
+       if(d<80){
+          return 0;
+       }
+       else{
+          return 500;
+       }
+    })
+    .attr("x2","1500")
+    .attr("y1", function(d){ return googleScale(d);})
+    .attr("y2",function(d){ return googleScale(d);})
+    .attr("stroke-width","2")
+    .attr("stroke","#CBC5C1")
+    .attr("opacity","0.5");
+
+  svg.selectAll("text")
+    .data(googleTrendRange)
+    .enter()
+    .append("text")
+    .attr("font-size","24")
+    .attr("x",function(d){
+      if(d<100){
+        return "1250";
+      }
+      else{
+        return "1240";
+      }
+    }
+      )
+    .attr("y",function(d){ return googleScale(d);})
+    .text(function(d){ if(d>0){
+                          return d;
+                        }
+                        else{
+                          return "";
+                        }
+    })
+    .attr("text-align","right")
+    .attr("font-family", "Roboto Condensed, sans-serif")
+    .attr("opacity","0.5");
+        
+ svg .append("text")
+     .text("SAFETY")
+     .attr("font-size","280")
+     .attr("x","-50")
+     .attr("y","450")
+     .attr("fill","#DBF2F2")
+     .attr("opacity","0.7")
+     .attr("font-family", "Roboto Condensed, sans-serif");
+
+svg .append("text")
+     .text("GUN")
+     .attr("font-size","280")
+     .attr("x","850")
+     .attr("y","200")
+     .attr("fill","#FF4B4C")
+     .attr("opacity","0.5")
+     .attr("font-family", "Roboto Condensed, sans-serif");
+
+
+
+ // Setting the Axes
+ svg.selectAll(".year")
+     .data(data)
+     .enter()
+     .append("text")
+     .attr("id", function(d){ if (d.date.getMonth()==0){
+                          return d.date.getFullYear();
+                        }})
+     .attr("x", function(d) { return w - xScale(d.date); })
+     .attr("y","640")
+     .attr("opacity", "0.6")
+     .attr("font-size","18")
+     .attr("font-family", "Roboto Condensed, sans-serif")
+     .text(function(d){ if (d.date.getMonth()==0){
+                          return d.date.getFullYear();
+                        }
+     });
+
+
+  svg.selectAll("bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bars")
+      .style("fill",function(d) { if(d.gun_violence==53||d.gun_violence==100||d.gun_violence==39||d.gun_violence==40){
+                                      return "#FF4B4C";
+                                  }
+                                  else{ return "#CBC5C1"; }
+      })
+      .attr("x", function(d) { return w - xScale(d.date); })
+      .attr("y", function(d) { return h - yScale(d.gun_violence); })
+      .attr("height", function(d) { return yScale(d.gun_violence); })
+      .attr("width", w/data.length - barPadding)
+      .on("mouseover", function(d) { // hover state events when mouse cursor enters a bar
+            // if(d.gun_violence==53||d.gun_violence==100||d.gun_violence==39||d.gun_violence==40){
+            //     d3.select(this)
+            //     .style("fill", "#FF4B4C");
+            // }
+            // else{
+            //    d3.select(this)
+            //     .style("fill", "black");
+            // }
+            
+            if(d.gun_violence==100){
+              // opacity .transition()
+                d3.select("#viol02")
+                  .transition()
+                  .attr("duration", "10")
+                  .style("opacity", "1");
+                d3.select("#viol02_text")
+                .transition()
+                  .attr("duration", "10")
+                .style("opacity", "1");
+
+
+              // d3.select("#viol02")
+              //   .style("visibility", "visible");
+              //   d3.select("#viol02_text")
+              //   .style("visibility", "visible");
+            }
+            else if(d.gun_violence==53){
+                d3.select("#viol01")
+                  .transition()
+                  .attr("duration", "10")
+                  .style("opacity", "1");
+
+                d3.select("#viol01_text")
+                .transition()
+                  .attr("duration", "10")
+                .style("opacity", "1");
+            }
+            else if(d.gun_violence==40){
+                d3.select("#viol03")
+                  .transition()
+                  .attr("duration", "10")
+                  .style("opacity", "1");
+
+                d3.select("#viol03_text")
+                .transition()
+                  .attr("duration", "10")
+                .style("opacity", "1");
+            }
+            else if(d.gun_violence==39){
+                d3.select("#viol04")
+                  .transition()
+                  .attr("duration", "10")
+                  .style("opacity", "1");
+
+                d3.select("#viol04_text")
+                .transition()
+                  .attr("duration", "10")
+                .style("opacity", "1");
+            }
+        })
+        .on("mouseout", function(d) { // hover events when mouse cursor leaves the bar
+
+          // if(d.gun_violence==53||d.gun_violence==100||d.gun_violence==39||d.gun_violence==40){
+          //     d3.select(this)
+          //       .style("fill", "#FF4B4C");
+          //   }
+          //   else{
+          //     d3.select(this)
+          //       .style("fill", "#CBC5C1");
+          //   }
+
+            if(d.gun_violence==100){
+
+              d3.select("#viol02")
+                  .transition()
+                  .attr("duration", "10")
+                  .style("opacity", "0");
+
+              d3.select("#viol02_text")
+                .transition()
+                .attr("duration", "10")
+                .style("opacity", "0");
+            }
+            else if(d.gun_violence==53){
+              d3.select("#viol01")
+                  .transition()
+                  .attr("duration", "10")
+                  .style("opacity", "0");
+                  
+              d3.select("#viol01_text")
+                .transition()
+                .attr("duration", "10")
+                .style("opacity", "0");
+            }
+            else if(d.gun_violence==40){
+              d3.select("#viol03")
+                  .transition()
+                  .attr("duration", "10")
+                  .style("opacity", "0");
+                  
+              d3.select("#viol03_text")
+                .transition()
+                .attr("duration", "10")
+                .style("opacity", "0");
+            }
+            else if(d.gun_violence==39){
+              d3.select("#viol04")
+                  .transition()
+                  .attr("duration", "10")
+                  .style("opacity", "0");
+                  
+              d3.select("#viol04_text")
+                .transition()
+                .attr("duration", "10")
+                .style("opacity", "0");
+            }
+
+        });
+
+
+
+
+
+
+     
+
+
+});
+ 
+</script>
