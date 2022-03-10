@@ -1,5 +1,5 @@
 # Course Final Project - GDes 5372: Data Visualization for Interactive Platforms (University of Minnesota, Twin-Cities)
-Data Visualization - Victims of Gun Violence &amp; Google Trends
+Data Visualization using D3.js - Victims of Gun Violence &amp; Google Trends
 
 Website: https://kimx3966.github.io/data_visualization_final_project/
 
